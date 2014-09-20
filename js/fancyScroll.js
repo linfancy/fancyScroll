@@ -108,6 +108,11 @@ fancyScroll.prototype = {
 		this.info.inHeight = this.innerContent.clientHeight;
 		this.info.inLeft = this.innerContent.offsetLeft;
 		this.info.inTop = this.innerContent.offsetTop;
+
+		if(this.scrollspan){
+			this.info.scrollTop = this.scrollspan.offsetTop;
+			this.info.scrollLeft = this.scrollspan.offsetLeft;
+		}
 	},
 	caculate : function(){
 		if(this.info.inHeight <= this.info.outHeight)return false;
@@ -117,8 +122,7 @@ fancyScroll.prototype = {
 	},
 	createScroll : function(){
 		this.caculate();
-		console.log(this.info.scrollWidth);
-		if(this.info.scrollWidth == 0)console.log("false");
+		if(this.info.scrollWidth == 0)return false;
 		else{
 			this.scrollContent = document.createElement("div");
 			this.scrollContent.className = "fancy-scrollContent";
@@ -128,10 +132,24 @@ fancyScroll.prototype = {
 			this.scrollspan = document.createElement("div");
 			this.scrollspan.className = "fancy-scrollSpan";
 			U.changeCss(this.scrollspan, "height", this.info.scrollWidth+"px");
-			this.scrollContent.appendChild(this.scrollspan);		
+			this.scrollContent.appendChild(this.scrollspan);	
+
+			this.dragScroll();	
 		}
 	},
-	
+	dragScroll : function(){
+		var self = this;
+		U.addHandler(self.scrollspan, "mousedown", function(e){
+			var e = e ? e : window.event;
+			var originpos = e.clientY;
+			var _this = this;
+
+			this.info.scrollTop = this.scrollspan.offsetTop;
+			this.info.scrollLeft = this.scrollspan.offsetLeft;
+
+			
+		});
+	}
 }
 
 var fs = new fancyScroll("fancy-scroll");
