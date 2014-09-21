@@ -144,8 +144,34 @@ fancyScroll.prototype = {
 			var originpos = e.clientY;
 			var _this = this;
 
-			this.info.scrollTop = this.scrollspan.offsetTop;
-			this.info.scrollLeft = this.scrollspan.offsetLeft;
+			self.info.scrollTop = self.scrollspan.offsetTop;
+			self.info.scrollLeft = self.scrollspan.offsetLeft;
+			
+			U.addHandler(document, "mousemove", scrollGo);
+			U.addHandler(document, "mouseup", function(){
+				U.removeHandler(document, "mousemove", scrollGo);
+				U.removeHandler(document, "mouseup", null);
+				return false;
+			});
+
+			function scrollGo(e){
+				var oe = e ? e : window.event;
+				var currentpos = e.clientY;
+				var pos = currentpos - originpos + self.info.scrollTop;
+
+				pos > self.info.outHeight - self.info.scrollWidth && (pos = self.info.outHeight - self.info.scrollWidth);
+				pos < 0 && (pos = 0);
+
+				U.changeCss(self.scrollspan, "top", pos+"px");
+
+				var contentpos = self.info.inTop-((self.info.inHeight-self.info.outHeight)/(self.info.outHeight - self.info.scrollWidth) * (currentpos-originpos));
+
+				contentpos < self.info.outHeight - self.info.inHeight && (contentpos = self.info.outHeight - self.info.inHeight);
+				contentpos > 0 && (contentpos = 0);
+
+				U.changeCss(self.innerContent, "top", contentpos+"px");
+
+			}
 
 			
 		});
