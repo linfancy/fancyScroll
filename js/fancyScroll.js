@@ -60,6 +60,25 @@ var U = {
 			}
 		}
 		return childNode;
+	},
+
+	uniformMotion : function(elem, target, fn){
+		elem.timer && clearInterval(elem.timer);
+		elem.timer = setInterval(function(){
+			doMove();
+		}, 60);
+
+		function doMove(){
+			var speed = (target - elem.offsetTop) / 5;
+			speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
+			console.log(elem.offsetTop+" "+target);
+			if(Math.abs(elem.offsetTop-target) < 1){
+				U.changeCss(elem, "top", target + "px");
+				clearInterval(elem.timer);
+				fn && fn();
+			}
+			U.changeCss(elem, "top", elem.offsetTop + speed + "px");
+		}
 	}
 };
 
@@ -89,6 +108,7 @@ fancyScroll.prototype = {
 		scrollLeft : 0,
 		scrollWidth : 0
 	},
+	timer : null,
 
 	main : function(outContent){
 		this.init(outContent);
@@ -134,7 +154,8 @@ fancyScroll.prototype = {
 			U.changeCss(this.scrollspan, "height", this.info.scrollWidth+"px");
 			this.scrollContent.appendChild(this.scrollspan);	
 
-			this.dragScroll();	
+			this.dragScroll();	//绑定拖拽事件
+			this.scrollScroll();
 		}
 	},
 	dragScroll : function(){
@@ -151,6 +172,9 @@ fancyScroll.prototype = {
 			U.addHandler(document, "mouseup", function(){
 				U.removeHandler(document, "mousemove", scrollGo);
 				U.removeHandler(document, "mouseup", null);
+				self.info.scrollTop = self.scrollspan.offsetTop;
+				self.info.scrollLeft = self.scrollspan.offsetLeft;
+				console.log(self.info);
 				return false;
 			});
 
@@ -170,11 +194,37 @@ fancyScroll.prototype = {
 				contentpos > 0 && (contentpos = 0);
 
 				U.changeCss(self.innerContent, "top", contentpos+"px");
-
 			}
-
-			
 		});
+	},
+	scrollScroll : function(){
+		var self = this;
+		U.addHandler(self.outContent, "mouseover", function(e){
+			var e = e ? e : window.event;
+			U.addHandler(this, "mousewheel", mouseWheel);
+			U.addHandler(this, "DOMMouseScroll", mouseWheel);
+			U.addHandler(window, "mousewheel", function(){return false});
+			U.addHandler(window, "DOMMouseScroll", function(){return false});
+
+			function mouseWheel(e){
+				var delta = e.wheelDelta ? e.wheelDelta : -e.detail*40;
+				var iTarget = delta > 0 ? -50 : 50;
+				self.togetherMove(self.scrollspan.offsetTop + iTarget);
+			}
+		});
+	},
+	togetherMove : function(target, fn){
+		if(target <= 0){
+			this.scrollspan.timer && clearInterval(this.scrollspan.timer);
+			target = 0;
+		}
+		if(target >= this.info.outHeight - this.info.scrollWidth){
+			this.scrollspan.timer && clearInterval(this.scrollspan.timer);
+			target = this.info.outHeight - this.info.scrollWidth;	
+		}
+		U.uniformMotion(this.scrollspan, target);
+		U.uniformMotion(this.innerContent, -(this.info.inHeight - this.info.outHeight)/(this.info.outHeight - this.info.scrollWidth)*target);
+
 	}
 }
 
