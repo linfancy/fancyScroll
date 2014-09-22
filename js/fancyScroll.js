@@ -117,7 +117,6 @@ fancyScroll.prototype = {
 		this.innerContent = U.getChildNode(this.outContent)[0];
 		this.getContentInfo();
 		this.createScroll();
-		
 	},
 	getContentInfo : function(){
 		this.info.outWidth = this.outContent.clientWidth;
@@ -221,7 +220,6 @@ fancyScroll.prototype = {
 				}else{
 					return false;
 				}
-				
 			}
 			
 			return false;
@@ -238,7 +236,9 @@ fancyScroll.prototype = {
 		}
 		U.uniformMotion(this.scrollspan, target);
 		U.uniformMotion(this.innerContent, -(this.info.inHeight - this.info.outHeight)/(this.info.outHeight - this.info.scrollWidth)*target);
-
+	}
+	windowResize : function(){
+		
 	}
 }
 
