@@ -86,16 +86,13 @@ var U = {
 /*  start a plugins of scroll  */
 
 function fancyScroll(){
-	this.main.apply(this, arguments);
-}
+	this.outContent = null;
+	this.innerContent = null;//里层
+	this.scrollContent = null;//滚动条包裹
+	this.scrollspan = null;//滚动块
+	this.nomalStyle = true;
 
-fancyScroll.prototype = {
-	outContent : null, //外层
-	innerContent : null, //里层
-	scrollContent : null, //滚动条包裹
-	scrollspan : null, //滚动块
-	nomalStyle : true,
-	info : {           //滚动内容的基本信息
+	this.info = {//滚动内容的基本信息
 		outWidth : 0,
 		outHeight : 0,
 		outLeft : 0,
@@ -107,17 +104,21 @@ fancyScroll.prototype = {
 		scrollTop : 0,
 		scrollLeft : 0,
 		scrollWidth : 0
-	},
-	timer : null,
+	};
 
+	this.main.apply(this, arguments);
+}
+
+fancyScroll.prototype = {
 	main : function(outContent){
 		this.init(outContent);
 	},
 	init : function(outContent){
 		this.outContent = U.byId(outContent);
-		this.innerContent = U.getChildNode("fancy-scroll")[0];
+		this.innerContent = U.getChildNode(this.outContent)[0];
 		this.getContentInfo();
 		this.createScroll();
+		console.log(this.scrollspan);
 		
 	},
 	getContentInfo : function(){
@@ -135,10 +136,12 @@ fancyScroll.prototype = {
 		}
 	},
 	caculate : function(){
-		if(this.info.inHeight <= this.info.outHeight)return false;
-		else{
+		if(this.info.inHeight <= this.info.outHeight){
+			return false;
+		}else{
 			this.info.scrollWidth = this.info.outHeight / this.info.inHeight * this.info.outHeight;
 		}
+		console.log(this.info);
 	},
 	createScroll : function(){
 		this.caculate();
@@ -167,6 +170,8 @@ fancyScroll.prototype = {
 
 			self.info.scrollTop = self.scrollspan.offsetTop;
 			self.info.scrollLeft = self.scrollspan.offsetLeft;
+			self.info.inTop = self.innerContent.offsetTop;
+			self.info.inLeft = self.innerContent.offsetLeft;
 			
 			U.addHandler(document, "mousemove", scrollGo);
 			U.addHandler(document, "mouseup", function(){
@@ -174,7 +179,6 @@ fancyScroll.prototype = {
 				U.removeHandler(document, "mouseup", null);
 				self.info.scrollTop = self.scrollspan.offsetTop;
 				self.info.scrollLeft = self.scrollspan.offsetLeft;
-				console.log(self.info);
 				return false;
 			});
 
@@ -211,6 +215,8 @@ fancyScroll.prototype = {
 				var iTarget = delta > 0 ? -50 : 50;
 				self.togetherMove(self.scrollspan.offsetTop + iTarget);
 			}
+
+			return false;
 		});
 	},
 	togetherMove : function(target, fn){
@@ -228,4 +234,3 @@ fancyScroll.prototype = {
 	}
 }
 
-var fs = new fancyScroll("fancy-scroll");
