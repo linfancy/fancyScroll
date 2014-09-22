@@ -71,7 +71,6 @@ var U = {
 		function doMove(){
 			var speed = (target - elem.offsetTop) / 5;
 			speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
-			console.log(elem.offsetTop+" "+target);
 			if(Math.abs(elem.offsetTop-target) < 1){
 				U.changeCss(elem, "top", target + "px");
 				clearInterval(elem.timer);
@@ -118,7 +117,6 @@ fancyScroll.prototype = {
 		this.innerContent = U.getChildNode(this.outContent)[0];
 		this.getContentInfo();
 		this.createScroll();
-		console.log(this.scrollspan);
 		
 	},
 	getContentInfo : function(){
@@ -141,7 +139,6 @@ fancyScroll.prototype = {
 		}else{
 			this.info.scrollWidth = this.info.outHeight / this.info.inHeight * this.info.outHeight;
 		}
-		console.log(this.info);
 	},
 	createScroll : function(){
 		this.caculate();
@@ -205,17 +202,28 @@ fancyScroll.prototype = {
 		var self = this;
 		U.addHandler(self.outContent, "mouseover", function(e){
 			var e = e ? e : window.event;
-			U.addHandler(this, "mousewheel", mouseWheel);
-			U.addHandler(this, "DOMMouseScroll", mouseWheel);
+			U.addHandler(self.outContent, "mousewheel", mouseWheel);
+			U.addHandler(self.outContent, "DOMMouseScroll", mouseWheel);
 			U.addHandler(window, "mousewheel", function(){return false});
 			U.addHandler(window, "DOMMouseScroll", function(){return false});
 
-			function mouseWheel(e){
-				var delta = e.wheelDelta ? e.wheelDelta : -e.detail*40;
+			function mouseWheel(event){
+				var delta = event.wheelDelta ? event.wheelDelta : -event.detail*40;
 				var iTarget = delta > 0 ? -50 : 50;
 				self.togetherMove(self.scrollspan.offsetTop + iTarget);
+				if(event.stopPropagation){
+					event.stopPropagation();
+				}else{
+					event.cancelBubble=true;
+				}
+				if (event.preventDefault) {
+					event.preventDefault();	
+				}else{
+					return false;
+				}
+				
 			}
-
+			
 			return false;
 		});
 	},
