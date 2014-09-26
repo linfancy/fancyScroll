@@ -240,6 +240,7 @@ fancyScroll.prototype = {
 		var startPos = null;
 		var endPos = null;
 		U.addHandler(self.innerContent, "touchstart", function(e){
+			self.caculateInfo();
 			var e = e ? e : window.event;
 			var touch = e.targetTouches[0];
 			startPos = {x:touch.pageX, y:touch.pageY};
@@ -265,18 +266,20 @@ fancyScroll.prototype = {
 
 		function touchend(event){
 			self.caculateInfo();
+			if(endPos != null){
+				var pos = self.info.inTop + (endPos.y/2);
+				pos > 0 && (pos = 0);
+				pos < self.outContent.offsetHeight - self.innerContent.offsetHeight && (pos = self.outContent.offsetHeight - self.innerContent.offsetHeight);
 
-			var pos = self.info.inTop + (endPos.y/2);
-			pos > 0 && (pos = 0);
-			pos < self.outContent.offsetHeight - self.innerContent.offsetHeight && (pos = self.outContent.offsetHeight - self.innerContent.offsetHeight);
+				var spanpos = self.info.scrollTop - ((self.info.outHeight - self.info.scrollWidth)/(self.info.inHeight - self.info.outHeight)*endPos.y);
+				spanpos < 0 && (spanpos = 0);
+				spanpos > self.info.outHeight - self.info.scrollWidth && (spanpos = self.info.outHeight - self.info.scrollWidth);
 
-			var spanpos = self.info.scrollTop - ((self.info.outHeight - self.info.scrollWidth)/(self.info.inHeight - self.info.outHeight)*endPos.y);
-			spanpos < 0 && (spanpos = 0);
-			spanpos > self.info.outHeight - self.info.scrollWidth && (spanpos = self.info.outHeight - self.info.scrollWidth);
-
-			U.uniformMotion(self.innerContent, pos);
-			U.uniformMotion(self.scrollspan, spanpos);
-			self.caculateInfo();
+				U.uniformMotion(self.innerContent, pos);
+				U.uniformMotion(self.scrollspan, spanpos);
+				self.caculateInfo();
+			}
+			
 		}
 	},
 
