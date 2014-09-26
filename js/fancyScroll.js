@@ -165,10 +165,7 @@ fancyScroll.prototype = {
 			var originpos = e.clientY;
 			var _this = this;
 
-			self.info.scrollTop = self.scrollspan.offsetTop;
-			self.info.scrollLeft = self.scrollspan.offsetLeft;
-			self.info.inTop = self.innerContent.offsetTop;
-			self.info.inLeft = self.innerContent.offsetLeft;
+			self.caculateInfo();
 			
 			U.addHandler(document, "mousemove", scrollGo);
 			U.addHandler(document, "mouseup", function(){
@@ -247,15 +244,15 @@ fancyScroll.prototype = {
 			var touch = e.targetTouches[0];
 			startPos = {x:touch.pageX, y:touch.pageY};
 			U.addHandler(self.innerContent, "touchmove", touchmove);
-			
+			U.addHandler(self.innerContent, "touchend", touchend);
 		});
 
 		function touchmove(event){
 			var touch = event.targetTouches[0];
 			endPos = {x:touch.pageX - startPos.x, y:touch.pageY - startPos.y};
 			event.preventDefault && event.preventDefault();
-			var pos = self.innerContent.offsetTop + endPos.y;
-			var spanpos = self.scrollspan.offsetTop - ((self.info.outHeight - self.info.scrollWidth)/(self.info.inHeight - self.info.outHeight)*endPos.y);
+			var pos = self.info.inTop + endPos.y;
+			var spanpos = self.info.scrollTop - ((self.info.outHeight - self.info.scrollWidth)/(self.info.inHeight - self.info.outHeight)*endPos.y);
 
 			pos > 0 && (pos = 0);
 			pos < self.outContent.offsetHeight - self.innerContent.offsetHeight && (pos = self.outContent.offsetHeight - self.innerContent.offsetHeight);
@@ -267,8 +264,27 @@ fancyScroll.prototype = {
 		}
 
 		function touchend(event){
+			self.caculateInfo();
 
+			var pos = self.info.inTop + (endPos.y/2);
+			pos > 0 && (pos = 0);
+			pos < self.outContent.offsetHeight - self.innerContent.offsetHeight && (pos = self.outContent.offsetHeight - self.innerContent.offsetHeight);
+
+			var spanpos = self.info.scrollTop - ((self.info.outHeight - self.info.scrollWidth)/(self.info.inHeight - self.info.outHeight)*endPos.y);
+			spanpos < 0 && (spanpos = 0);
+			spanpos > self.info.outHeight - self.info.scrollWidth && (spanpos = self.info.outHeight - self.info.scrollWidth);
+
+			U.uniformMotion(self.innerContent, pos);
+			U.uniformMotion(self.scrollspan, spanpos);
+			self.caculateInfo();
 		}
+	},
+
+	caculateInfo : function(){
+		this.info.scrollTop = this.scrollspan.offsetTop;
+		this.info.scrollLeft = this.scrollspan.offsetLeft;
+		this.info.inTop = this.innerContent.offsetTop;
+		this.info.inLeft = this.innerContent.offsetLeft;
 	}
 }
 
