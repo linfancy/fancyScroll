@@ -242,7 +242,6 @@ fancyScroll.prototype = {
 		var self = this;
 		var startPos = null;
 		var endPos = null;
-		console.log(self.innerContent);
 		U.addHandler(self.innerContent, "touchstart", function(e){
 			var e = e ? e : window.event;
 			var touch = e.targetTouches[0];
@@ -256,15 +255,19 @@ fancyScroll.prototype = {
 			endPos = {x:touch.pageX - startPos.x, y:touch.pageY - startPos.y};
 			event.preventDefault && event.preventDefault();
 			var pos = self.innerContent.offsetTop + endPos.y;
+			var spanpos = self.scrollspan.offsetTop - ((self.info.outHeight - self.info.scrollWidth)/(self.info.inHeight - self.info.outHeight)*endPos.y);
 
-			console.log(pos + " " + (self.outContent.offsetHeight - self.innerContent.offsetHeight));
 			pos > 0 && (pos = 0);
 			pos < self.outContent.offsetHeight - self.innerContent.offsetHeight && (pos = self.outContent.offsetHeight - self.innerContent.offsetHeight);
+
+			spanpos < 0 && (spanpos = 0);
+			spanpos > self.info.outHeight - self.info.scrollWidth && (spanpos = self.info.outHeight - self.info.scrollWidth);
 			U.changeCss(self.innerContent, "top", pos+"px");
+			U.changeCss(self.scrollspan, "top", spanpos+"px");
 		}
 
 		function touchend(event){
-			
+
 		}
 	}
 }
