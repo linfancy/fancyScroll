@@ -155,6 +155,7 @@ fancyScroll.prototype = {
 
 			this.dragScroll();	//绑定拖拽事件
 			this.scrollScroll();
+			this.touchScroll();
 		}
 	},
 	dragScroll : function(){
@@ -236,9 +237,35 @@ fancyScroll.prototype = {
 		}
 		U.uniformMotion(this.scrollspan, target);
 		U.uniformMotion(this.innerContent, -(this.info.inHeight - this.info.outHeight)/(this.info.outHeight - this.info.scrollWidth)*target);
-	}
-	windowResize : function(){
-		
+	},
+	touchScroll : function(){
+		var self = this;
+		var startPos = null;
+		var endPos = null;
+		console.log(self.innerContent);
+		U.addHandler(self.innerContent, "touchstart", function(e){
+			var e = e ? e : window.event;
+			var touch = e.targetTouches[0];
+			startPos = {x:touch.pageX, y:touch.pageY};
+			U.addHandler(self.innerContent, "touchmove", touchmove);
+			
+		});
+
+		function touchmove(event){
+			var touch = event.targetTouches[0];
+			endPos = {x:touch.pageX - startPos.x, y:touch.pageY - startPos.y};
+			event.preventDefault && event.preventDefault();
+			var pos = self.innerContent.offsetTop + endPos.y;
+
+			console.log(pos + " " + (self.outContent.offsetHeight - self.innerContent.offsetHeight));
+			pos > 0 && (pos = 0);
+			pos < self.outContent.offsetHeight - self.innerContent.offsetHeight && (pos = self.outContent.offsetHeight - self.innerContent.offsetHeight);
+			U.changeCss(self.innerContent, "top", pos+"px");
+		}
+
+		function touchend(event){
+			
+		}
 	}
 }
 
