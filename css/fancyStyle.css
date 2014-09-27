@@ -1,4 +1,23 @@
+
+
 .fancy-scrollContent{
+	width: 9px;
+	position: absolute;
+	top: 0px;
+	right: 0;
+	background: transparent;
+}
+.fancy-scrollSpan{
+	position: absolute;
+	top: 0px;
+	left: 2px;
+	width: 5px;
+	border-radius: 2.5px;
+	cursor: pointer;
+	background: #333;
+}
+
+.anotherScroll{
 	width: 7px;
 	background: #333;
 	position: absolute;
@@ -6,7 +25,7 @@
 	right: 0;
 	border:1px solid #333;
 }
-.fancy-scrollSpan{
+.anotherScrollspan{
 	width: 100%;
 	background: #fff;
 	position: absolute;

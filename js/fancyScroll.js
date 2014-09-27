@@ -89,7 +89,12 @@ function fancyScroll(){
 	this.innerContent = null;//里层
 	this.scrollContent = null;//滚动条包裹
 	this.scrollspan = null;//滚动块
-	this.nomalStyle = true;
+	this.config = {
+		scrollContentStyle : "fancy-scrollContent",
+		scrollspanStyle : "fancy-scrollSpan",
+		hScrollbar : false,
+		vScrollbar : true,
+	}
 
 	this.info = {//滚动内容的基本信息
 		outWidth : 0,
@@ -109,12 +114,16 @@ function fancyScroll(){
 }
 
 fancyScroll.prototype = {
-	main : function(outContent){
-		this.init(outContent);
+	main : function(outContent, config){
+		this.init(outContent, config);
 	},
-	init : function(outContent){
+	init : function(outContent, config){
 		this.outContent = U.byId(outContent);
 		this.innerContent = U.getChildNode(this.outContent)[0];
+		for(var elem in config){
+			this.config[elem] != null && (this.config[elem] = config[elem]);
+		}
+		console.log(this.config);
 		this.getContentInfo();
 		this.createScroll();
 	},
@@ -144,12 +153,12 @@ fancyScroll.prototype = {
 		if(this.info.scrollWidth == 0)return false;
 		else{
 			this.scrollContent = document.createElement("div");
-			this.scrollContent.className = "fancy-scrollContent";
+			this.scrollContent.className = this.config.scrollContentStyle;
 			U.changeCss(this.scrollContent, "height", this.info.outHeight+"px");
 			this.outContent.appendChild(this.scrollContent);
 
 			this.scrollspan = document.createElement("div");
-			this.scrollspan.className = "fancy-scrollSpan";
+			this.scrollspan.className = this.config.scrollspanStyle;
 			U.changeCss(this.scrollspan, "height", this.info.scrollWidth+"px");
 			this.scrollContent.appendChild(this.scrollspan);	
 
@@ -282,7 +291,6 @@ fancyScroll.prototype = {
 			
 		}
 	},
-
 	caculateInfo : function(){
 		this.info.scrollTop = this.scrollspan.offsetTop;
 		this.info.scrollLeft = this.scrollspan.offsetLeft;
